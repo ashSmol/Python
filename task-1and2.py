@@ -8,7 +8,9 @@ with open("my_text.txt", mode="a+", encoding="utf-8") as my_file:
     my_file.seek(0)
     strs_list = my_file.readlines()
     my_file.seek(0)
+    print("Содержимое файла:")
     print(my_file.read())
     print(f"Количество строк в файле равно: {len(strs_list)}")
-    words_count = [len(stroka.split()) for stroka in strs_list]
-    print(f"Количество слов каждой строке: {words_count}")
+    #    words_count = [len(stroka.split()) for stroka in strs_list]
+    for index, el in enumerate([len(stroka.split()) for stroka in strs_list]):
+        print(f"Количество слов в строке №{index + 1} равно: {el}")

@@ -79,4 +79,3 @@ police_car = PoliceCar(100, 'черный', "БМВ", True)
 police_car.out()
 police_car = PoliceCar(200, 'Синий', "Мерседес", True)
 police_car.out()
-

@@ -9,8 +9,8 @@ class TrafficLight:
         colors_order = [("red", 7), ("yellow", 3), ("green", 7), ("yellow", 3)]
 
         for elem in cycle(colors_order):
-            TrafficLight.__color = elem[0]
-            print(f"{TrafficLight.__color}")
+            self.__color = elem[0]
+            print(f"{self.__color}")
             sleep(elem[1])
 
 

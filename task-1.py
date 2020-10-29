@@ -10,7 +10,7 @@ class Matrix:
         str_matrix = ''
         for row in self.matrix:
             for el in row:
-                str_matrix += str(el) + '\t'
+                str_matrix += f'{el:5}'
             str_matrix += '\n'
         return str_matrix
 

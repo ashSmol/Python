@@ -243,9 +243,7 @@ while user_input != 'выход':
                                 print(f'В отделе осталось:\n')
                                 print(selected_dept)
                                 break
-                        #    CompanyDepartment.move_item(selected_dept, selected_to_dept)
             if command == '4':
-
                 from_dept = ''
                 while from_dept != '0':
                     print('*' * 50 + '   Меню   ' + '*' * 50)

@@ -1,26 +1,26 @@
 item_reference = {}
 
 
+def register_item(item):
+    item_reference[len(item_reference) + 1] = item
+
+
 class Company:
     def __init__(self, depts_list):
         self.depts = {}
         for el in depts_list:
-            self.depts.update({len(self.depts) + 1: el.name})
+            self.depts.update({len(self.depts) + 1: el})
 
     def __str__(self):
         result = ''
         for el in self.depts:
-            result += f'{el}. {self.depts.get(el)}\n'
+            result += f'{el}. {self.depts.get(el).name}\n'
         return result
 
 
 class NegativeAmountException(Exception):
     def __init__(self, err_text):
         self.err_text = err_text
-
-
-def register_item(item):
-    item_reference[len(item_reference) + 1] = item
 
 
 class CompanyDepartment:
@@ -32,8 +32,9 @@ class CompanyDepartment:
         result = ''
         for el in self.items_quantities:
             if self.items_quantities.get(el) > 0:
-                result += f'{el}. {item_reference.get(el).__class__.__name__} {item_reference.get(el)} - {self.items_quantities[el]} шт \n'
-        return result
+                result += f'{el}. {item_reference.get(el).__class__.__name__} {item_reference.get(el)} - ' \
+                          f'{self.items_quantities[el]} шт \n'
+        return result if result != '' else 'В отделе пока нет оборудования'
 
     @staticmethod
     def move_item(from_dep_1, to_dep_2, item_id, quantity=1):
@@ -44,6 +45,14 @@ class CompanyDepartment:
             to_dep_2.items_quantities[item_id] = to_dep_2.items_quantities[item_id] + quantity
         except NegativeAmountException as err:
             print(err)
+
+    def get_equipment_by_type(self, equipment_type):
+
+        result = f'{equipment_type}s:\n'
+        for key_ in self.items_quantities:
+            if (item_reference.get(key_).__class__.__name__ == equipment_type) & (self.items_quantities[key_] > 0):
+                result += f'{item_reference[key_]} - {self.items_quantities[key_]} шт \n'
+        return result if result != f'{equipment_type}s:\n' else f'В отделе {self.name} отсутсвет запрашиваемое оборудование'
 
 
 class Warehouse(CompanyDepartment):
@@ -104,16 +113,50 @@ dev_dep = CompanyDepartment('Разработка')
 design_dep = CompanyDepartment('Дизайн')
 wh = Warehouse()
 
-depts_list = [counting_dept, h_r_dept, admin_dept, dev_dep, design_dep]
-
-
+depts_list = [counting_dept, h_r_dept, admin_dept, dev_dep, design_dep, wh]
+equipment_dict = {}
+equipment_dict = {1: 'Printer', 2: 'Scanner', 3: 'Copier'}
 my_company = Company(depts_list)
-user_command = ''
 
-#d = {}
-#print({len(d) + 1: el for el in 'asdfg'})
+CompanyDepartment.move_item(wh, h_r_dept, 4, 2)
+print(equipment_dict)
+# d = {}
+# print({len(d) + 1: el for el in 'asdfg'})
 
-while user_command != 'выход':
+# print(my_company.depts[int('2')].get_equipment_by_type(equipment_dict[equipment_dict]))
+
+
+user_input = ''
+while user_input != 'выход':
     print('*' * 50 + '   Меню   ' + '*' * 50)
-    print('введите номер оборудования для перемещения: ')
-    item_id = input()
+    print('Выберите отдел предприятия. для выхода введите "выход"')
+    print('*' * 110)
+    print(my_company)
+    user_input = input('Ваш выбор: ')
+    if user_input == "выход":
+        break
+    else:
+        dept = user_input
+        command = ''
+        while command != '3':
+            print('*' * 50 + '   Меню   ' + '*' * 50)
+            print(
+                f'1. Вывод всего оборудования отдела {my_company.depts[int(dept)].name}. 2. Вывод оборудования по типу '
+                f'3. Вернуться к выбору отдела')
+            print('*' * 110)
+            command = input("Ваш выбор: ")
+            if command == '1':
+                print(my_company.depts[int(dept)])
+            if command == '2':
+                equipment_type = ''
+                while equipment_type != '4':
+                    print('*' * 50 + '   Меню   ' + '*' * 50)
+                    print('Выберите тип оборудования: ')
+                    print('*' * 110)
+                    for el in equipment_dict:
+                        print(f'{el}. {equipment_dict[el]}')
+                    print('4. Вернуться')
+                    equipment_type = input('Введите номер желаемого типа оборудования: ')
+                    if equipment_type == '4':
+                        break
+                    print(my_company.depts[int(dept)].get_equipment_by_type(equipment_dict[int(equipment_type)]))

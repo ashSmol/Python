@@ -88,6 +88,7 @@ class Copier(OfficeEquipment):
         self.is_analog = is_analog
 
 
+# наполнение справочника офисного оборудования
 register_item(Printer('hp', '3110', False))
 register_item(Printer('epson', 'photo', True))
 register_item(Printer('cannon', '10', False))
@@ -105,27 +106,40 @@ register_item(Copier('HP', 'LaserJet Pro MFP M28a', False))
 register_item(Copier('Xerox', 'WorkCentre 3025V_BI', True))
 register_item(Copier('Pantum ', 'M6500', False))
 register_item(Copier('brother', 'copier555', True))
-
+# Создание отделов компании
 counting_dept = CompanyDepartment('Бухгалтерия')
 h_r_dept = CompanyDepartment('Отдел Кадров')
 admin_dept = CompanyDepartment('Администрация')
 dev_dep = CompanyDepartment('Разработка')
 design_dep = CompanyDepartment('Дизайн')
 wh = Warehouse()
-
+# Создание моей компании и наполнение компании отделами
 depts_list = [counting_dept, h_r_dept, admin_dept, dev_dep, design_dep, wh]
-equipment_dict = {}
-equipment_dict = {1: 'Printer', 2: 'Scanner', 3: 'Copier'}
 my_company = Company(depts_list)
+# наполнение отделов оборудованием со склада
+CompanyDepartment.move_item(wh, counting_dept, 3, 3)
+CompanyDepartment.move_item(wh, counting_dept, 8, 3)
+CompanyDepartment.move_item(wh, counting_dept, 13, 3)
 
 CompanyDepartment.move_item(wh, h_r_dept, 4, 2)
-print(equipment_dict)
-# d = {}
-# print({len(d) + 1: el for el in 'asdfg'})
+CompanyDepartment.move_item(wh, h_r_dept, 9, 3)
+CompanyDepartment.move_item(wh, h_r_dept, 14, 1)
 
-# print(my_company.depts[int('2')].get_equipment_by_type(equipment_dict[equipment_dict]))
+CompanyDepartment.move_item(wh, admin_dept, 1, 5)
+CompanyDepartment.move_item(wh, admin_dept, 6, 5)
+CompanyDepartment.move_item(wh, admin_dept, 11, 5)
 
+CompanyDepartment.move_item(wh, dev_dep, 2, 1)
+CompanyDepartment.move_item(wh, dev_dep, 7, 1)
+CompanyDepartment.move_item(wh, dev_dep, 12, 1)
 
+CompanyDepartment.move_item(wh, design_dep, 5, 4)
+CompanyDepartment.move_item(wh, design_dep, 10, 4)
+CompanyDepartment.move_item(wh, design_dep, 15, 1)
+
+equipment_dict = {}
+equipment_dict = {1: 'Printer', 2: 'Scanner', 3: 'Copier'}
+# запрашиваем пользователя
 user_input = ''
 while user_input != 'выход':
     print('*' * 50 + '   Меню   ' + '*' * 50)
@@ -136,27 +150,148 @@ while user_input != 'выход':
     if user_input == "выход":
         break
     else:
-        dept = user_input
+        try:
+            selected_dept = my_company.depts[int(user_input)]
+        except (ValueError, KeyError):
+            print('Нужно ввести число от 1 до 6 !!!')
         command = ''
-        while command != '3':
+        while command != '0':
             print('*' * 50 + '   Меню   ' + '*' * 50)
-            print(
-                f'1. Вывод всего оборудования отдела {my_company.depts[int(dept)].name}. 2. Вывод оборудования по типу '
-                f'3. Вернуться к выбору отдела')
+            try:
+                print(
+                    f'1. Вывод всего оборудования отдела "{selected_dept.name}". 2. Вывод оборудования по типу\n'
+                    f'3. Перевод оборудования из отдела "{selected_dept.name}". 4. Перевод оборудования в отдел'
+                    f' "{selected_dept.name}".\n0. Вернуться к выбору отдела')
+            except NameError:
+                break
             print('*' * 110)
             command = input("Ваш выбор: ")
             if command == '1':
-                print(my_company.depts[int(dept)])
+                print(selected_dept)
             if command == '2':
                 equipment_type = ''
-                while equipment_type != '4':
+                while equipment_type != '0':
                     print('*' * 50 + '   Меню   ' + '*' * 50)
                     print('Выберите тип оборудования: ')
                     print('*' * 110)
                     for el in equipment_dict:
                         print(f'{el}. {equipment_dict[el]}')
-                    print('4. Вернуться')
+                    print('0. Вернуться')
                     equipment_type = input('Введите номер желаемого типа оборудования: ')
-                    if equipment_type == '4':
+                    if equipment_type == '0':
                         break
-                    print(my_company.depts[int(dept)].get_equipment_by_type(equipment_dict[int(equipment_type)]))
+                    try:
+                        print(selected_dept.get_equipment_by_type(equipment_dict[int(equipment_type)]))
+                    except(ValueError, KeyError):
+                        print('Нужно выбрать ввести число!!!')
+                        break
+            if command == '3':
+
+                to_dept = ''
+                while to_dept != '0':
+                    print('*' * 50 + '   Меню   ' + '*' * 50)
+                    print(
+                        f'Выберите отдел в который хотете перевести оборудование из "{selected_dept.name}": ')
+                    print('*' * 110)
+                    print(my_company)
+                    print('0. Вернуться')
+                    to_dept = input("Ваш выбор: ")
+                    if to_dept == '0':
+                        break
+                    else:
+                        try:
+                            selected_to_dept = my_company.depts[int(to_dept)]
+                        except (ValueError, KeyError) as err:
+                            print(err)
+                            break
+                        equipment = None
+                        while equipment != '0':
+                            print('*' * 50 + '   Меню   ' + '*' * 50)
+                            print(
+                                f'Выберите оборудование для перевода из отдела "{selected_dept.name}"  в отдел '
+                                f'"{selected_to_dept.name}": ')
+                            print('*' * 110)
+                            print(selected_dept)
+                            print('0. Вернуться')
+                            equipment = input("Ваш выбор: ")
+                            if equipment == '0':
+                                break
+                            try:
+                                selected_equipment = int(equipment)
+                            except ValueError as err:
+                                print(err)
+                                break
+                            qnty = None
+                            while qnty != '0':
+                                print('*' * 50 + '   Меню   ' + '*' * 50)
+                                try:
+                                    print(
+                                        f'Введите количество оборудования {item_reference[selected_equipment]} для перевода'
+                                        f' из отдела "{selected_dept.name}"  в отдел "{selected_to_dept.name}": ')
+                                except KeyError as err:
+                                    print(err)
+                                    break
+                                print('*' * 110)
+                                print('0. Вернуться')
+                                qnty = input("Ваш выбор: ")
+                                try:
+                                    CompanyDepartment.move_item(selected_dept, selected_to_dept, selected_equipment,
+                                                                int(qnty))
+                                except ValueError as err:
+                                    print(err)
+                                    break
+                                print(f'В отделе осталось:\n')
+                                print(selected_dept)
+                                break
+                        #    CompanyDepartment.move_item(selected_dept, selected_to_dept)
+            if command == '4':
+
+                from_dept = ''
+                while from_dept != '0':
+                    print('*' * 50 + '   Меню   ' + '*' * 50)
+                    print(
+                        f'Выберите отдел из которого хотете перевести оборудование в "{selected_dept.name}": ')
+                    print('*' * 110)
+                    print(my_company)
+                    print('0. Вернуться')
+                    from_dept = input("Ваш выбор: ")
+                    if from_dept == '0':
+                        break
+                    else:
+                        try:
+                            selected_from_dept = my_company.depts[int(from_dept)]
+                        except(ValueError, KeyError):
+                            break
+                        equipment = None
+                        while equipment != '0':
+                            print('*' * 50 + '   Меню   ' + '*' * 50)
+                            print(
+                                f'Выберите оборудование для перевода в отдел "{selected_dept.name}" из отдела '
+                                f'"{selected_from_dept.name}": ')
+                            print('*' * 110)
+                            print(selected_from_dept)
+                            print('0. Вернуться')
+                            equipment = input("Ваш выбор: ")
+                            if equipment == '0':
+                                break
+                            try:
+                                selected_equipment = int(equipment)
+                            except(ValueError, KeyError):
+                                break
+                            qnty = None
+                            while qnty != '0':
+                                print('*' * 50 + '   Меню   ' + '*' * 50)
+                                try:
+                                    print(
+                                        f'Введите количество оборудования {item_reference[selected_equipment]} для перевода'
+                                        f' в отдел "{selected_dept.name}"  из отдел "{selected_from_dept.name}": ')
+                                except(ValueError, KeyError):
+                                    break
+                                print('*' * 110)
+                                print('0. Вернуться')
+                                qnty = input("Ваш выбор: ")
+                                CompanyDepartment.move_item(selected_from_dept, selected_dept, selected_equipment,
+                                                            int(qnty))
+                                print(f'Теперь в отделе "{selected_dept.name}":\n')
+                                print(selected_dept)
+                                break
